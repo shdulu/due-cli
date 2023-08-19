@@ -9,5 +9,6 @@
   "dependencies": {
     "chalk": "^5.3.0",
     "execa": "^8.0.0"
-  }
+  },
+  "gitHead": "28d287f6b21c71f9a2cc6cfe35c19bb9f7ff6202"
 }
