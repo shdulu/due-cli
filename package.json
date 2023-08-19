@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "手写@vue/cli 实现",
   "scripts": {
-    "create": "node packages/due-cli/bin/vue.js create hello1"
+    "create": "due create testProject"
   },
   "workspaces": [
     "packages/*"

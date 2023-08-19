@@ -1,5 +1,15 @@
 #!/usr/bin/env node
 
-let { a } = require("due-cli-shared-utils");
-console.log(a);
-console.log("vue cli");
+const program = require("commander");
+
+program
+  .version(`due/cli ${require("../package").version}`)
+  .usage("<command> [options]");
+
+program
+  .command("create <app-name>")
+  .description("create a new project powered by vue-cli-service")
+  .action((name, options) => {
+    require("../lib/create")(name, options);
+  });
+program.parse(process.argv);
