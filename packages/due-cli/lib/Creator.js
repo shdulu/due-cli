@@ -1,7 +1,9 @@
-// const { formatFeatures } = require('./util/features')
 const inquirer = require("inquirer");
+const cloneDeep = require("lodash.clonedeep");
+const { chalk, execa } = require("due-cli-shared-utils");
 const { defaults } = require("./options");
 const PromptModuleAPI = require("./PromptModuleAPI");
+const writeFileTree = require("./util/writeFileTree");
 
 // 是否手工模式
 const isManualMode = (answers) => answers.preset === "__manual__";
@@ -17,16 +19,67 @@ module.exports = class Creator {
     this.injectedPrompts = [];
     this.promptCompleteCbs = [];
 
+    this.run = this.run.bind(this);
     const promptAPI = new PromptModuleAPI(this);
     promptModules.forEach((m) => m(promptAPI));
   }
-  async create() {
-    let preset = await this.promptAndResolvePresets();
-    console.log(preset);
+
+  run(command, args) {
+    // 在context 目录下执行命令
+    return execa(command, args, { cwd: this.context });
   }
-  async promptAndResolvePresets() {
+  async create() {
+    const { name, context } = this;
+    let preset = await this.promptAndResolvePreset();
+    console.log(preset);
+    preset = cloneDeep(preset);
+    // @vue/cli-service是核心包，自带webpack配置以及build serve 等命令
+    preset.plugins["@vue/cli-service"] = Object.assign(
+      { projectName: name },
+      preset
+    );
+    console.log(`✨  Creating project in ${chalk.yellow(context)}.`);
+    const pkg = {
+      name,
+      version: "0.1.0",
+      private: true,
+      devDependencies: {},
+    };
+    const deps = Object.keys(preset.plugins);
+    deps.forEach((dep) => {
+      pkg.devDependencies[dep] = "latest"; // getVersion
+    });
+    // 写入package.json
+    await writeFileTree(context, {
+      "package.json": JSON.stringify(pkg, null, 2),
+    });
+    // 初始化git仓库
+    console.log(`🗃  Initializing git repository...`);
+    await this.run("git init");
+    // install plugins
+    console.log(
+      `⚙\u{fe0f}  Installing CLI plugins. This might take a while...`
+    );
+    await this.run("npm install"); // 安装依赖的模块
+    // run generator
+    console.log(`🚀  Invoking generators...`)
+  }
+  async resolvePreset(name) {
+    return this.getPresets()[name];
+  }
+  async promptAndResolvePreset() {
     let answers = await inquirer.prompt(this.resolveFinalPrompts());
-    return answers;
+    let preset;
+    if (answers.preset && answers.preset !== "__manual__") {
+      preset = await this.resolvePreset(answers.preset);
+    } else {
+      preset = {
+        plugins: {},
+      };
+      answers.features = answers.features || [];
+      this.promptCompleteCbs.forEach((cb) => cb(answers, preset));
+    }
+    return preset;
   }
   resolveFinalPrompts() {
     this.injectedPrompts.forEach((prompt) => {

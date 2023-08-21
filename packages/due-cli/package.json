@@ -9,7 +9,7 @@
     "due": "bin/vue.js"
   },
   "dependencies": {
-    "chalk": "^5.3.0",
+    "chalk": "4",
     "commander": "^7.1.0",
     "due-cli-shared-utils": "^1.0.2-alpha.0",
     "ejs": "^3.1.9",

@@ -13,7 +13,6 @@ exports.defaultPreset = {
 exports.defaults = {
   lastChecked: undefined,
   latestVersion: undefined,
-
   packageManager: undefined,
   useTaobaoRegistry: undefined,
   presets: {
