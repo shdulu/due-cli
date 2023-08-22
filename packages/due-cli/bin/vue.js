@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const program = require("commander");
-
+debugger
 program
   .version(`due/cli ${require("../package").version}`)
   .usage("<command> [options]");

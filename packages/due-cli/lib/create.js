@@ -9,6 +9,7 @@ const { getPromptModules } = require("./util/createTools");
  * @param {*} projectName 项目名称
  */
 async function create(projectName, options) {
+  debugger
   const cwd = options.cwd || process.cwd(); // 获取当前工作目录
   const name = projectName; // 项目名称
   const targetDir = path.resolve(cwd, name);

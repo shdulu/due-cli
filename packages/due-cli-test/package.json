@@ -6,5 +6,8 @@
   "homepage": "",
   "license": "ISC",
   "main": "lib/due-cli-test.js",
-  "gitHead": "eb55c54f0853339052e34cccf8a2ccb2bc14bfb9"
+  "gitHead": "eb55c54f0853339052e34cccf8a2ccb2bc14bfb9",
+  "scripts": {
+    "dev": "due create hello1"
+  }
 }
