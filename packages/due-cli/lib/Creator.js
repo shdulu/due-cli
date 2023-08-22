@@ -1,9 +1,10 @@
 const inquirer = require("inquirer");
 const cloneDeep = require("lodash.clonedeep");
-const { chalk, execa } = require("due-cli-shared-utils");
+const { chalk, execa, loadModule } = require("due-cli-shared-utils");
 const { defaults } = require("./options");
 const PromptModuleAPI = require("./PromptModuleAPI");
 const writeFileTree = require("./util/writeFileTree");
+const Generator = require("./Generator");
 
 // 是否手工模式
 const isManualMode = (answers) => answers.preset === "__manual__";
@@ -62,7 +63,25 @@ module.exports = class Creator {
     );
     await this.run("npm install"); // 安装依赖的模块
     // run generator
-    console.log(`🚀  Invoking generators...`)
+    console.log(`🚀  Invoking generators...`);
+    const plugins = await this.resolvePlugins(preset.plugins);
+    const generator = new Generator(context, { pkg, plugins });
+    await generator.generate();
+  }
+
+  // { id: options } => [{ id, apply, options }]
+  async resolvePlugins(rawPlugins) {
+    const plugins = [];
+    for (const id of Object.keys(rawPlugins)) {
+      const apply = loadModule(`${id}/generator`, this.context) || (() => {});
+      let options = rawPlugins[id] || {};
+      plugins.push({
+        id,
+        apply,
+        options,
+      });
+    }
+    return plugins;
   }
   async resolvePreset(name) {
     return this.getPresets()[name];

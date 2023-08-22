@@ -8,7 +8,7 @@
   "main": "index.js",
   "dependencies": {
     "chalk": "4",
-    "execa": "^8.0.0"
+    "execa": "4"
   },
   "gitHead": "eb55c54f0853339052e34cccf8a2ccb2bc14bfb9"
 }
